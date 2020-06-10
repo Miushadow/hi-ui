@@ -19,8 +19,6 @@ AS
 └───hi-ui ui组件库
 │   
 └───hi-library library组件库
-│   
-└───hi-demo 架构师demo中心
 ```
 
 ### 如何运行
