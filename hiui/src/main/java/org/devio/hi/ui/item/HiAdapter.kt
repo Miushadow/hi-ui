@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView.*
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import java.lang.ref.WeakReference
 import java.lang.reflect.ParameterizedType
+import java.lang.reflect.Type
 
 /**
  * 通用数据适配器
@@ -19,7 +20,7 @@ import java.lang.reflect.ParameterizedType
  * bugfix:HiDataItem<*, out RecyclerView.ViewHolder>  都被改成了这样。否则会有类型转换问题
  */
 class HiAdapter(context: Context) : Adapter<ViewHolder>() {
-    private val recyclerViewRef: WeakReference<RecyclerView>? = null
+    private var recyclerViewRef: WeakReference<RecyclerView>? = null
     private var mContext: Context = context
     private var mInflater = LayoutInflater.from(context)
     private var dataSets = java.util.ArrayList<HiDataItem<*, out ViewHolder>>()
@@ -227,10 +228,7 @@ class HiAdapter(context: Context) : Adapter<ViewHolder>() {
             //得到它携带的泛型参数的数组
             val arguments = superclass.actualTypeArguments
             //挨个遍历判断 是不是咱们想要的 RecyclerView.ViewHolder 子类 类型的。
-            for (argument in arguments) if (argument is Class<*> && ViewHolder::class.java.isAssignableFrom(
-                    argument
-                )
-            ) {
+            for (argument in arguments) if (argument is Class<*> && ViewHolder::class.java.isAssignableFrom(argument)) {
                 try {
                     //如果是，则使用反射 实例化类上标记的实际的泛型对象
                     //这里需要  try-catch 一把，如果咱们直接在HiDataItem子类上标记 RecyclerView.ViewHolder，抽象类是不允许反射的
@@ -241,8 +239,9 @@ class HiAdapter(context: Context) : Adapter<ViewHolder>() {
                 }
             }
         }
-        return object : ViewHolder(view) {}
+        return object : HiViewHolder(view) {}
     }
+
 
     override fun getItemCount(): Int {
         return dataSets.size + getHeaderSize() + getFooterSize()
@@ -251,7 +250,7 @@ class HiAdapter(context: Context) : Adapter<ViewHolder>() {
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
-
+        recyclerViewRef = WeakReference(recyclerView)
         /**
          * 为列表上的item 适配网格布局
          */
@@ -282,7 +281,7 @@ class HiAdapter(context: Context) : Adapter<ViewHolder>() {
         recyclerViewRef?.clear()
     }
 
-     open fun getAttachRecyclerView(): RecyclerView? {
+    open fun getAttachRecyclerView(): RecyclerView? {
         return recyclerViewRef?.get()
     }
 
@@ -291,7 +290,6 @@ class HiAdapter(context: Context) : Adapter<ViewHolder>() {
             return null
         return dataSets[position] as HiDataItem<*, ViewHolder>
     }
-
 
     override fun onViewAttachedToWindow(holder: ViewHolder) {
         val recyclerView = getAttachRecyclerView()
