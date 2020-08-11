@@ -72,4 +72,8 @@ abstract class HiDataItem<DATA, VH : RecyclerView.ViewHolder>(data: DATA? = null
 
     }
 
+   open fun onCreateViewHolder(parent: ViewGroup): VH? {
+        return null
+    }
+
 }

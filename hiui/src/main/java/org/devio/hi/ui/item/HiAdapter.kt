@@ -2,6 +2,7 @@ package org.devio.hi.ui.item
 
 import android.content.Context
 import android.util.SparseArray
+import android.util.SparseIntArray
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,14 +25,15 @@ class HiAdapter(context: Context) : Adapter<ViewHolder>() {
     private var mContext: Context = context
     private var mInflater = LayoutInflater.from(context)
     private var dataSets = java.util.ArrayList<HiDataItem<*, out ViewHolder>>()
-    private var typeArrays = SparseArray<HiDataItem<*, out ViewHolder>>()
+
+    //private var typeArrays = SparseArray<HiDataItem<*, out ViewHolder>>()
+    private val typePositions = SparseIntArray();
 
     private var headers = SparseArray<View>()
     private var footers = SparseArray<View>()
-
-
     private var BASE_ITEM_TYPE_HEADER = 1000000
     private var BASE_ITEM_TYPE_FOOTER = 2000000
+
     fun addHeaderView(view: View) {
         //没有添加过
         if (headers.indexOfValue(view) < 0) {
@@ -65,7 +67,6 @@ class HiAdapter(context: Context) : Adapter<ViewHolder>() {
         notifyItemRemoved(indexOfValue + getHeaderSize() + getOriginalItemSize())
     }
 
-
     fun getHeaderSize(): Int {
         return headers.size()
     }
@@ -78,7 +79,6 @@ class HiAdapter(context: Context) : Adapter<ViewHolder>() {
         return dataSets.size
     }
 
-
     /**
      *在指定为上添加HiDataItem
      */
@@ -87,13 +87,13 @@ class HiAdapter(context: Context) : Adapter<ViewHolder>() {
         dataItem: HiDataItem<*, out ViewHolder>,
         notify: Boolean
     ) {
-        if (index > 0) {
+        if (index >= 0) {
             dataSets.add(index, dataItem)
         } else {
             dataSets.add(dataItem)
         }
 
-        val notifyPos = if (index > 0) index else dataSets.size - 1
+        val notifyPos = if (index >= 0) index else dataSets.size - 1
         if (notify) {
             notifyItemInserted(notifyPos)
         }
@@ -115,12 +115,11 @@ class HiAdapter(context: Context) : Adapter<ViewHolder>() {
         }
     }
 
-
     /**
      * 从指定位置上移除item
      */
     fun removeItemAt(index: Int): HiDataItem<*, out ViewHolder>? {
-        if (index > 0 && index < dataSets.size) {
+        if (index >= 0 && index < dataSets.size) {
             val remove: HiDataItem<*, out ViewHolder> = dataSets.removeAt(index)
             notifyItemRemoved(index)
             return remove
@@ -128,7 +127,6 @@ class HiAdapter(context: Context) : Adapter<ViewHolder>() {
             return null
         }
     }
-
 
     /**
      * 移除指定item
@@ -146,7 +144,6 @@ class HiAdapter(context: Context) : Adapter<ViewHolder>() {
         notifyItemChanged(indexOf)
     }
 
-
     /**
      * 以每种item类型的class.hashcode为 该item的viewType
      *
@@ -156,32 +153,22 @@ class HiAdapter(context: Context) : Adapter<ViewHolder>() {
         if (isHeaderPosition(position)) {
             return headers.keyAt(position)
         }
-
         if (isFooterPosition(position)) {
             //footer的位置 应该计算一下  position =6 , headercount =1  itemcoun=5 =,footersize=1
             val footerPosition = position - getHeaderSize() - getOriginalItemSize()
             return footers.keyAt(footerPosition)
         }
 
-
         val itemPosition = position - getHeaderSize()
         val dataItem = dataSets[itemPosition]
         val type = dataItem.javaClass.hashCode()
-        //如果还没有包含这种类型的item，则添加进来
-        if (typeArrays.indexOfKey(type) < 0) {
-            typeArrays.put(type, dataItem)
-        }
+
+        //按照原来的写法 相同的viewType仅仅只在第一次，会把viewType和dataItem关联
+//        if (typeArrays.indexOfKey(type) < 0) {
+//            typeArrays.put(type, dataItem)
+//        }
+        typePositions.put(type, position)
         return type
-    }
-
-    private fun isFooterPosition(position: Int): Boolean {
-        // 10->  4+ 4.
-        return position >= getHeaderSize() + getOriginalItemSize()
-    }
-
-    private fun isHeaderPosition(position: Int): Boolean {
-        // 5 --> 4 3 2 1
-        return position < headers.size()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -189,14 +176,20 @@ class HiAdapter(context: Context) : Adapter<ViewHolder>() {
             val view = headers[viewType]
             return object : RecyclerView.ViewHolder(view) {}
         }
-
         if (footers.indexOfKey(viewType) >= 0) {
             val view = footers[viewType]
             return object : RecyclerView.ViewHolder(view) {}
         }
 
+        //这会导致不同position，但viewType相同，获取到的dataItem始终是第一次关联的dataItem对象。
+        //这就会导致通过getItemView创建的成员变量，只在第一个dataItem中，其它实例中无法生效
 
-        val dataItem = typeArrays.get(viewType)
+        //为了解决dataItem成员变量binding, 刷新之后无法被复用的问题
+        val position = typePositions.get(viewType)
+        val dataItem = dataSets[position]
+        val vh = dataItem.onCreateViewHolder(parent)
+        if (vh != null) return vh
+
         var view: View? = dataItem.getItemView(parent)
         if (view == null) {
             val layoutRes = dataItem.getItemLayoutRes()
@@ -228,7 +221,10 @@ class HiAdapter(context: Context) : Adapter<ViewHolder>() {
             //得到它携带的泛型参数的数组
             val arguments = superclass.actualTypeArguments
             //挨个遍历判断 是不是咱们想要的 RecyclerView.ViewHolder 子类 类型的。
-            for (argument in arguments) if (argument is Class<*> && ViewHolder::class.java.isAssignableFrom(argument)) {
+            for (argument in arguments) if (argument is Class<*> && ViewHolder::class.java.isAssignableFrom(
+                    argument
+                )
+            ) {
                 try {
                     //如果是，则使用反射 实例化类上标记的实际的泛型对象
                     //这里需要  try-catch 一把，如果咱们直接在HiDataItem子类上标记 RecyclerView.ViewHolder，抽象类是不允许反射的
@@ -242,11 +238,19 @@ class HiAdapter(context: Context) : Adapter<ViewHolder>() {
         return object : HiViewHolder(view) {}
     }
 
+    private fun isFooterPosition(position: Int): Boolean {
+        // 10->  4+ 4.
+        return position >= getHeaderSize() + getOriginalItemSize()
+    }
+
+    private fun isHeaderPosition(position: Int): Boolean {
+        // 5 --> 4 3 2 1
+        return position < headers.size()
+    }
 
     override fun getItemCount(): Int {
         return dataSets.size + getHeaderSize() + getFooterSize()
     }
-
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
