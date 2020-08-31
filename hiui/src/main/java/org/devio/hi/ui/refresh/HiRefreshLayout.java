@@ -178,6 +178,7 @@ public class HiRefreshLayout extends FrameLayout implements HiRefresh {
             }
 
             View other;
+            //让HiRefreshLayout节点下两个以上的child能够不跟随手势移动以实现一些特殊效果，如悬浮的效果
             for (int i = 2; i < getChildCount(); ++i) {
                 other = getChildAt(i);
                 other.layout(0, top, right, bottom);
