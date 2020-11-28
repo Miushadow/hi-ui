@@ -93,6 +93,8 @@ public class HiBannerAdapter extends PagerAdapter {
      * @return
      */
     public int getFirstItem() {
+        //这里是为了配合instantiateItem方法中realPosition = position % getRealCount();
+        // - (Integer.MAX_VALUE / 2) % getRealCount()的主要目的是用于获取realPosition=0的位置
         return Integer.MAX_VALUE / 2 - (Integer.MAX_VALUE / 2) % getRealCount();
     }
 

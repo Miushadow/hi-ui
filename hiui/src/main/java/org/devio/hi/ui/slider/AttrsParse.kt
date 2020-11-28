@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import androidx.core.content.ContextCompat
 import org.devio.hi.library.util.HiDisplayUtil
+import org.devio.hi.library.util.HiRes
 import org.devio.hi.ui.R
 
 internal object AttrsParse {
@@ -14,11 +15,11 @@ internal object AttrsParse {
     private val MENU_HEIGHT = HiDisplayUtil.dp2px(45f)
     private val MENU_TEXT_SIZE = HiDisplayUtil.sp2px(14f)
 
-    private val TEXT_COLOR_NORMAL = Color.parseColor("#666666")
-    private val TEXT_COLOR_SELECT = Color.parseColor("#DD3127")
+    private val TEXT_COLOR_NORMAL = HiRes.getColor(R.color.color_666)//Color.parseColor("#666666")
+    private val TEXT_COLOR_SELECT = HiRes.getColor(R.color.color_127)//Color.parseColor("#DD3127")
 
-    private val BG_COLOR_NORMAL = Color.parseColor("#F7F8F9")
-    private val BG_COLOR_SELECT = Color.parseColor("#ffffff")
+    private val BG_COLOR_NORMAL = HiRes.getColor(R.color.color_8f9)//Color.parseColor("#F7F8F9")
+    private val BG_COLOR_SELECT = HiRes.getColor(R.color.color_white)//Color.parseColor("#ffffff")
 
     fun parseMenuItemAttr(context: Context, attrs: AttributeSet?): MenuItemAttr {
         val typedArray = context.obtainStyledAttributes(attrs, R.styleable.HiSliderView)
