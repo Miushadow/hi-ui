@@ -52,7 +52,7 @@ public class HiTabBottom extends RelativeLayout implements IHiTab<HiTabBottomInf
     }
 
     /**
-     * 将数据绑定到视图
+     * 将数据绑定到视图中
      * @param selected HiTabBottom是否被选中
      * @param init 是否是初始化
      */
