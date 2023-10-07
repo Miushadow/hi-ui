@@ -59,6 +59,9 @@ public class HiTabBottom extends RelativeLayout implements IHiTab<HiTabBottomInf
         tabNameView = findViewById(R.id.tv_name);
     }
 
+    /**
+     * 将传入的TabBottom数据存到类变量tabInfo中，并将数据填充到Tab
+     */
     @Override
     public void setHiTabInfo(@NonNull HiTabBottomInfo hiTabBottomInfo) {
         this.tabInfo = hiTabBottomInfo;
