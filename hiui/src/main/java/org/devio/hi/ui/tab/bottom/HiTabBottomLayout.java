@@ -25,19 +25,25 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Tips:
- * 1. 透明度和底部透出，列表可渲染高度问题
- * 2. 中间高度超过，凸起布局
+ * 外层容器控件，用于实现对单Tab组件的管理
  */
 public class HiTabBottomLayout extends FrameLayout implements IHiTabLayout<HiTabBottom, HiTabBottomInfo<?>> {
+
+    /**
+     * 成员变量分析：
+     * 1.tabSelectedChangeListeners: 通过一个集合来存放所有注册的OnTabSelectedListener
+     * 2.selectedInfo: 保存当前被选中Tab所对应的数据
+     * 3.bottomAlpha: TabBottom整体透明度
+     * 4.tabBottomHeight: TabBottom高度
+     * 5.bottomLineHeight: TabBottom的头部线条高度
+     * 6.bottomLineColor: TabBottom的头部线条颜色
+     * 7.infoList: TabBottom所对应的数据列表
+     */
     private List<OnTabSelectedListener<HiTabBottomInfo<?>>> tabSelectedChangeListeners = new ArrayList<>();
     private HiTabBottomInfo<?> selectedInfo;
     private float bottomAlpha = 1f;
-    //TabBottom高度
     private static float tabBottomHeight = 50;
-    //TabBottom的头部线条高度
     private float bottomLineHeight = 0.5f;
-    //TabBottom的头部线条颜色
     private String bottomLineColor = "#dfe0e1";
     private List<HiTabBottomInfo<?>> infoList;
 
@@ -53,27 +59,40 @@ public class HiTabBottomLayout extends FrameLayout implements IHiTabLayout<HiTab
         super(context, attrs, defStyleAttr);
     }
 
+    /**
+     * 将数据列表中的数据添加到视图中
+     */
     @Override
     public void inflateInfo(@NonNull List<HiTabBottomInfo<?>> infoList) {
         if (infoList.isEmpty()) {
             return;
         }
         this.infoList = infoList;
-        // 移除之前已经添加的View
+        /*
+            多次调用inflateInfo填充数据时，移除之前已经添加的View，防止数据重复添加
+            遍历视图中的子View，将除了第0个元素以外的子View都移除(第0个View是中间部分的视图，不用移除)
+         */
         for (int i = getChildCount() - 1; i > 0; i--) {
             removeViewAt(i);
         }
         selectedInfo = null;
         addBackground();
-        //清除之前添加的HiTabBottom listener，Tips：Java foreach remove问题
+        /*
+            清除之前添加的HiTabBottom listener
+            Tips：Java foreach remove问题，这里如果用for循环来对集合进行遍历并删除集合中的元素时会报错，因为我们不能
+            既对集合做增删改查的同时又对集合做遍历，解决方案是用迭代器来实现
+         */
         Iterator<OnTabSelectedListener<HiTabBottomInfo<?>>> iterator = tabSelectedChangeListeners.iterator();
         while (iterator.hasNext()) {
             if (iterator.next() instanceof HiTabBottom) {
                 iterator.remove();
             }
         }
-        int height = HiDisplayUtil.dp2px(tabBottomHeight, getResources());
+        /*
+            手动创建底部Tab的FrameLayout，设置其高度，并通过infoList的数量来计算出每一个Tab的宽度
+         */
         FrameLayout ll = new FrameLayout(getContext());
+        int height = HiDisplayUtil.dp2px(tabBottomHeight, getResources());
         int width = HiDisplayUtil.getDisplayWidthInPx(getContext()) / infoList.size();
         ll.setTag(TAG_TAB_BOTTOM);
         for (int i = 0; i < infoList.size(); i++) {
@@ -83,6 +102,10 @@ public class HiTabBottomLayout extends FrameLayout implements IHiTabLayout<HiTab
             params.gravity = Gravity.BOTTOM;
             params.leftMargin = i * width;
 
+            /*
+                实例化TabBottom，为每一个TabBottom实例都注册一个tabSelectedChangeListener，并将每一个TabBottom
+                对应的数据添加进去
+             */
             HiTabBottom tabBottom = new HiTabBottom(getContext());
             tabSelectedChangeListeners.add(tabBottom);
             tabBottom.setHiTabInfo(info);
@@ -123,6 +146,9 @@ public class HiTabBottomLayout extends FrameLayout implements IHiTabLayout<HiTab
         this.bottomLineColor = bottomLineColor;
     }
 
+    /**
+     * 通过数据来找到对应的Tab，这里需要为FrameLayout设置一个Tag，然后通过这个Tag找到对应的ViewGroup
+     */
     @Nullable
     @Override
     public HiTabBottom findTab(@NonNull HiTabBottomInfo<?> info) {
@@ -140,10 +166,13 @@ public class HiTabBottomLayout extends FrameLayout implements IHiTabLayout<HiTab
     }
 
     @Override
-    public void defaultSelected(@NonNull HiTabBottomInfo<?> defaultInfo) {
+    public void setDefaultSelectedTab(@NonNull HiTabBottomInfo<?> defaultInfo) {
         onSelected(defaultInfo);
     }
 
+    /**
+     * 遍历所有的监听器，通知它们TabBottom的选择产生了变化，并调用它们的回调onTabSelectedChange
+     */
     private void onSelected(@NonNull HiTabBottomInfo<?> nextInfo) {
         for (OnTabSelectedListener<HiTabBottomInfo<?>> listener : tabSelectedChangeListeners) {
             listener.onTabSelectedChange(infoList.indexOf(nextInfo), selectedInfo, nextInfo);
@@ -151,7 +180,9 @@ public class HiTabBottomLayout extends FrameLayout implements IHiTabLayout<HiTab
         this.selectedInfo = nextInfo;
     }
 
-
+    /**
+     * 添加底部的分割线条
+     */
     private void addBottomLine() {
         View bottomLine = new View(getContext());
         bottomLine.setBackgroundColor(Color.parseColor(bottomLineColor));
@@ -164,6 +195,9 @@ public class HiTabBottomLayout extends FrameLayout implements IHiTabLayout<HiTab
         bottomLine.setAlpha(bottomAlpha);
     }
 
+    /**
+     * 动态添加背景色
+     */
     private void addBackground() {
         View view = LayoutInflater.from(getContext()).inflate(R.layout.hi_bottom_layout_bg, null);
 
@@ -177,7 +211,7 @@ public class HiTabBottomLayout extends FrameLayout implements IHiTabLayout<HiTab
     private static final String TAG_TAB_BOTTOM = "TAG_TAB_BOTTOM";
 
     /**
-     * 修复内容区域的底部Padding
+     * 修复内容区域底部部分内容被TabBottom遮挡的问题
      */
     private void fixContentView() {
         if (!(getChildAt(0) instanceof ViewGroup)) {

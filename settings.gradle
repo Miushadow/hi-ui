@@ -1,5 +1,9 @@
 include ':app', ':hiui'
 rootProject.name='hi-ui'
 
+/**
+ * hiui和hilibrary都是作为独立工程中的Module进行管理，如果想要在hi-ui这个工程里引入hilibrary这个Module，则需要在
+ * 这里配置hilibrary的路径
+ */
 include ':hi-library'
-project(':hi-library').projectDir = "../hi-library/hilibrary" as File
+project(':hi-library').projectDir = "../hi-library-imooc/hilibrary" as File

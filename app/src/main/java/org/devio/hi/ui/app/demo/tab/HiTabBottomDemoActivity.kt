@@ -27,8 +27,8 @@ class HiTabBottomDemoActivity : AppCompatActivity() {
 //            HiTabInfo info = new HiTabInfo("tab" + i, bitmap, bitmap);
         val homeInfo = HiTabBottomInfo(
             "首页",
-            "fonts/iconfont.ttf",
-            getString(R.string.if_home),
+            "fonts/iconfont.ttf", //将iconfont.ttf资源文件放在项目的Assets目录下，这里填入它在Assets目录下的绝对路径
+            getString(R.string.if_home), //需要将具体的iconfont字体添加到strings.xml中，然后用string name的形式来引用
             null,
             "#ff656667",
             "#ffd44949"
