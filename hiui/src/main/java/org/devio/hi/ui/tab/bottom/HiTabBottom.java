@@ -60,7 +60,8 @@ public class HiTabBottom extends RelativeLayout implements IHiTab<HiTabBottomInf
     }
 
     /**
-     * 将传入的TabBottom数据存到类变量tabInfo中，并将数据填充到Tab
+     * 将传入的TabBottom数据存到类变量tabInfo中，并将数据以初始化的形式填充到Tab中
+     * 填充数据时，由于是初始化，所以selected为false，init为true
      */
     @Override
     public void setHiTabInfo(@NonNull HiTabBottomInfo hiTabBottomInfo) {
@@ -101,16 +102,15 @@ public class HiTabBottom extends RelativeLayout implements IHiTab<HiTabBottomInf
      * 为HiTabBottom视图进行数据填充
      *
      * @param selected 判断HiTabBottom是否被选中
-     * @param init 通过该参数来标识是否是第一次初始化
+     * @param init 通过该参数来标识是否是填充初始化数据
      */
     private void inflateInfo(boolean selected, boolean init) {
         if (tabInfo.tabType == HiTabBottomInfo.TabType.ICON) {
+            //初始化时，需要基于Tab的类型，将
             if (init) {
                 tabImageView.setVisibility(GONE);
                 tabIconView.setVisibility(VISIBLE);
-                /*
-                    通过TypeFace中的API，将传入的iconFont设置给tabIconView
-                 */
+                //通过TypeFace中的API，将传入的iconFont设置给tabIconView
                 Typeface typeface = Typeface.createFromAsset(getContext().getAssets(), tabInfo.iconFont);
                 tabIconView.setTypeface(typeface);
                 if (!TextUtils.isEmpty(tabInfo.name)) {
@@ -118,9 +118,7 @@ public class HiTabBottom extends RelativeLayout implements IHiTab<HiTabBottomInf
                 }
             }
 
-            /*
-               如果被选中了，需要将TextColor设置成选中状态的Color，否则使用默认Color
-             */
+            //如果被选中了，需要将TextColor设置成选中状态的Color，否则使用默认Color
             if (selected) {
                 tabIconView.setText(TextUtils.isEmpty(tabInfo.selectedIconName) ? tabInfo.defaultIconName : tabInfo.selectedIconName);
                 tabIconView.setTextColor(getTextColor(tabInfo.tintColor));
@@ -139,9 +137,7 @@ public class HiTabBottom extends RelativeLayout implements IHiTab<HiTabBottomInf
                     tabNameView.setText(tabInfo.name);
                 }
             }
-            /*
-                如果被选中了，则将Bitmap设置成对应的选中状态下的Bitmap，否则使用默认Bitmap
-             */
+            //如果被选中了，则将Bitmap设置成对应的选中状态下的Bitmap，否则使用默认Bitmap
             if (selected) {
                 tabImageView.setImageBitmap(tabInfo.selectedBitmap);
             } else {

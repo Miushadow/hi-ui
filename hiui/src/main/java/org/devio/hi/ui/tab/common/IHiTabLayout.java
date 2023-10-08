@@ -32,11 +32,12 @@ public interface IHiTabLayout<Tab extends ViewGroup, D> {
 
     /**
      * 为Tab添加被选中后的监听器
+     * 这里的回调设计思路是，
      */
     void addTabSelectedChangeListener(OnTabSelectedListener<D> listener);
 
     /**
-     设置默认选中的数据
+     根据默认数据，设置默认选中的Tab
      */
     void setDefaultSelectedTab(@NonNull D defaultInfo);
 
