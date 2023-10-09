@@ -32,7 +32,13 @@ public interface IHiTabLayout<Tab extends ViewGroup, D> {
 
     /**
      * 为Tab添加被选中后的监听器
-     * 这里的回调设计思路是，
+     * 这个Listener的设计思路如下：
+     * 
+     * 1.当初始化时，每个Tab都需要添加这个Listener。因为当切换Tab后，处理Tab的选中状态时，不仅要处理被选中的Tab，
+     * 将其状态改为选中（包括图标，颜色等），也要处理之前的Tab，将其状态改为未选中（包括图标，颜色等）
+     * 
+     * 2.在最外层的Activity去使用HiTabBottomLayout这个控件时，也要添加这个Listener，这样当Tab进行切换时，就可以
+     * 通知到最外层的Activity，让它去进行对应Fragment的切换
      */
     void addTabSelectedChangeListener(OnTabSelectedListener<D> listener);
 

@@ -94,6 +94,7 @@ public class HiTabBottomLayout extends FrameLayout implements IHiTabLayout<HiTab
         FrameLayout ll = new FrameLayout(getContext());
         int height = HiDisplayUtil.dp2px(tabBottomHeight, getResources());
         int width = HiDisplayUtil.getDisplayWidthInPx(getContext()) / infoList.size();
+        //设置一个TAG，方便与其他Tab进行区分
         ll.setTag(TAG_TAB_BOTTOM);
         for (int i = 0; i < infoList.size(); i++) {
             final HiTabBottomInfo<?> info = infoList.get(i);
@@ -109,10 +110,12 @@ public class HiTabBottomLayout extends FrameLayout implements IHiTabLayout<HiTab
             HiTabBottom tabBottom = new HiTabBottom(getContext());
             tabSelectedChangeListeners.add(tabBottom);
             tabBottom.setHiTabInfo(info);
+            //将继承于RelativeLayout的控件HiTabBottom添加到FrameLayout的底部，按照顺序进行排列
             ll.addView(tabBottom, params);
             tabBottom.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    //处理回调，当单个Tab被点击时，通知所有的Listener，处理选中的逻辑。
                     onSelected(info);
                 }
             });
@@ -147,7 +150,10 @@ public class HiTabBottomLayout extends FrameLayout implements IHiTabLayout<HiTab
     }
 
     /**
-     * 通过数据来找到对应的Tab，这里需要为FrameLayout设置一个Tag，然后通过这个Tag找到对应的ViewGroup
+     * 通过数据来找到对应的Tab
+     * 
+     * 这里需要为FrameLayout设置一个Tag，然后通过这个Tag找到对应的ViewGroup，
+     * 再遍历这个ViewGroup，针对每个Tab，通过getHiTabInfo获取对应的info，进行比对
      */
     @Nullable
     @Override
