@@ -25,7 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * 外层容器控件，用于实现对单Tab组件的管理
+ * 外层容器控件，用于实现对单Tab组件的管理，继承于FrameLayout，大小是整个Content
  */
 public class HiTabBottomLayout extends FrameLayout implements IHiTabLayout<HiTabBottom, HiTabBottomInfo<?>> {
 
@@ -55,6 +55,9 @@ public class HiTabBottomLayout extends FrameLayout implements IHiTabLayout<HiTab
         this(context, attrs, 0);
     }
 
+    /*
+     * 所有构造方法最后都走到参数最多的这个构造方法
+     */
     public HiTabBottomLayout(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
@@ -98,7 +101,10 @@ public class HiTabBottomLayout extends FrameLayout implements IHiTabLayout<HiTab
         ll.setTag(TAG_TAB_BOTTOM);
         for (int i = 0; i < infoList.size(); i++) {
             final HiTabBottomInfo<?> info = infoList.get(i);
-            //Tips：为何不用LinearLayout：当动态改变child大小后Gravity.BOTTOM会失效
+            /*
+             * Tips：为何不用LinearLayout：因为TabBottom控件的高度是可以动态调整的，我们设置图标时是可以设置为超出其默认高度的。
+             * 如果使用LinearLayout得话，当动态改变child大小后Gravity.BOTTOM会失效，所以我们使用FrameLayout来构建底部布局
+            */
             LayoutParams params = new LayoutParams(width, height);
             params.gravity = Gravity.BOTTOM;
             params.leftMargin = i * width;
@@ -110,7 +116,7 @@ public class HiTabBottomLayout extends FrameLayout implements IHiTabLayout<HiTab
             HiTabBottom tabBottom = new HiTabBottom(getContext());
             tabSelectedChangeListeners.add(tabBottom);
             tabBottom.setHiTabInfo(info);
-            //将继承于RelativeLayout的控件HiTabBottom添加到FrameLayout的底部，按照顺序进行排列
+            //将继承于RelativeLayout的控件HiTabBottom按照从左到右的顺序进行排列，添加到FrameLayout中
             ll.addView(tabBottom, params);
             tabBottom.setOnClickListener(new OnClickListener() {
                 @Override
@@ -123,8 +129,9 @@ public class HiTabBottomLayout extends FrameLayout implements IHiTabLayout<HiTab
         LayoutParams flPrams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
         flPrams.gravity = Gravity.BOTTOM;
         addBottomLine();
+        //将FrameLayout添加到整个容器的底部
         addView(ll, flPrams);
-
+        //修复内容区域的底部部分内容被TabBottom遮挡的问题
         fixContentView();
     }
 
@@ -217,6 +224,7 @@ public class HiTabBottomLayout extends FrameLayout implements IHiTabLayout<HiTab
     private static final String TAG_TAB_BOTTOM = "TAG_TAB_BOTTOM";
 
     /**
+     * 加入HiTabBottomLayout后，会导致内容列表部分最底部的内容被遮挡，这时应该将被遮挡的内容往上推一部分
      * 修复内容区域底部部分内容被TabBottom遮挡的问题
      */
     private void fixContentView() {
@@ -228,6 +236,7 @@ public class HiTabBottomLayout extends FrameLayout implements IHiTabLayout<HiTab
         if (targetView == null) {
             targetView = HiViewUtil.findTypeView(rootView, ScrollView.class);
         }
+        
         if (targetView == null) {
             targetView = HiViewUtil.findTypeView(rootView, AbsListView.class);
         }
