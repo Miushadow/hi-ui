@@ -224,7 +224,7 @@ public class HiTabBottomLayout extends FrameLayout implements IHiTabLayout<HiTab
     private static final String TAG_TAB_BOTTOM = "TAG_TAB_BOTTOM";
 
     /**
-     * 修复内容区域底部部分内容被TabBottom遮挡的问题
+     * 修复内容区域列表的底部部分内容被TabBottom遮挡，显示不全的问题
      * 加入HiTabBottomLayout后，会导致内容列表部分最底部的内容被遮挡，这时应该将被遮挡的内容往上移动
      */
     private void fixContentView() {
