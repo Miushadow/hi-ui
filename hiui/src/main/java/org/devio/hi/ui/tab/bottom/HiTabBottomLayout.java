@@ -224,14 +224,15 @@ public class HiTabBottomLayout extends FrameLayout implements IHiTabLayout<HiTab
     private static final String TAG_TAB_BOTTOM = "TAG_TAB_BOTTOM";
 
     /**
-     * 加入HiTabBottomLayout后，会导致内容列表部分最底部的内容被遮挡，这时应该将被遮挡的内容往上推一部分
      * 修复内容区域底部部分内容被TabBottom遮挡的问题
+     * 加入HiTabBottomLayout后，会导致内容列表部分最底部的内容被遮挡，这时应该将被遮挡的内容往上移动
      */
     private void fixContentView() {
         if (!(getChildAt(0) instanceof ViewGroup)) {
             return;
         }
         ViewGroup rootView = (ViewGroup) getChildAt(0);
+        //targetView为HiTabBottomLayout上方的列表视图，可能是RecyclerView/ScrollView/AbsListView中的一种
         ViewGroup targetView = HiViewUtil.findTypeView(rootView, RecyclerView.class);
         if (targetView == null) {
             targetView = HiViewUtil.findTypeView(rootView, ScrollView.class);
@@ -240,12 +241,17 @@ public class HiTabBottomLayout extends FrameLayout implements IHiTabLayout<HiTab
         if (targetView == null) {
             targetView = HiViewUtil.findTypeView(rootView, AbsListView.class);
         }
+        //将视图列表与底部TabView设置padding
         if (targetView != null) {
             targetView.setPadding(0, 0, 0, HiDisplayUtil.dp2px(tabBottomHeight, getResources()));
             targetView.setClipToPadding(false);
         }
     }
 
+    /**
+     * 提供给外部的接口，用于给targetView设置padding
+     * @param targetView
+     */
     public static void clipBottomPadding(ViewGroup targetView) {
         if (targetView != null) {
             targetView.setPadding(0, 0, 0, HiDisplayUtil.dp2px(tabBottomHeight));
