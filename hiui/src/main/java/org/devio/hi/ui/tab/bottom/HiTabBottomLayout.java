@@ -225,7 +225,17 @@ public class HiTabBottomLayout extends FrameLayout implements IHiTabLayout<HiTab
 
     /**
      * 修复内容区域列表的底部部分内容被TabBottom遮挡，显示不全的问题
-     * 加入HiTabBottomLayout后，会导致内容列表部分最底部的内容被遮挡，这时应该将被遮挡的内容往上移动
+     * HiTabBottomLayout中的内容区域的底部部分会被HiTabBottom组件遮挡，这时应该将被遮挡的内容往上移动
+     * 
+     * Q：为什么要判断ViewGroup的类型？
+     * A：我们需要将HiTabBottom之上的整个ViewGroup进行上移，实作时，这个ViewGroup一般来说都是可以滚动的，继承于
+     *    RecyclerView/ScrollView/AbsListView中的一种
+     * 
+     * Q：如果遇到不是这三种类型的ViewGroup该如何处理？
+     * A：在实作中，如果遇到一些复杂的ViewGroup，不属于上述三种View，则应该直接调用下面的公用方法clipBottomPadding，
+     *    并将实际的ViewGroup传入，来设置Padding。
+     *    例子：如主工程ASProject中的HomePageFragment，在HiTabBottomLayout中用ViewPager来展示内容，不属于默认的三种ViewGroup，
+     *    则直接调用clipBottomPadding，将viewPager传进来，进行Padding的设置。
      */
     private void fixContentView() {
         if (!(getChildAt(0) instanceof ViewGroup)) {
