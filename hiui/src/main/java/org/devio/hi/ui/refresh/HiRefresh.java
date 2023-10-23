@@ -27,6 +27,9 @@ public interface HiRefresh {
      */
     void setRefreshOverView(HiOverView hiOverView);
 
+    /**
+     * 定义下拉刷新的监听器
+     */
     interface HiRefreshListener {
 
         void onRefresh();

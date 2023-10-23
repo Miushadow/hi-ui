@@ -3,6 +3,9 @@ package org.devio.hi.ui.refresh;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 
+/**
+ * 原生GestureDetector的子类，只实现原生GestureDetector的部分方法
+ */
 public class HiGestureDetector implements GestureDetector.OnGestureListener {
     @Override
     public boolean onDown(MotionEvent e) {

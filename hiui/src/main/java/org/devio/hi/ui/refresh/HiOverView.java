@@ -8,6 +8,7 @@ import org.devio.hi.library.util.HiDisplayUtil;
 
 /**
  * 下拉刷新的Overlay视图,可以重载这个类来定义自己的Overlay
+ * 继承自FrameLayout，方便扩展
  */
 public abstract class HiOverView extends FrameLayout {
     public enum HiRefreshState {
@@ -44,7 +45,7 @@ public abstract class HiOverView extends FrameLayout {
      */
     public float minDamp = 1.6f;
     /**
-     * 最大阻尼
+     * 最大阻尼（越往下拉阻尼越大）
      */
     public float maxDamp = 2.2f;
 
@@ -73,6 +74,9 @@ public abstract class HiOverView extends FrameLayout {
      */
     public abstract void init();
 
+    /**
+     * 通过该方法，告诉实现类滚动的Y轴，以及下拉刷新的高度
+     */
     protected abstract void onScroll(int scrollY, int pullRefreshHeight);
 
     /**

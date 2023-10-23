@@ -13,7 +13,7 @@ import org.devio.hi.library.log.HiLog;
 import org.devio.hi.ui.refresh.HiOverView.HiRefreshState;
 
 /**
- * 下拉刷新View
+ * 下拉刷新界面的外层容器View
  */
 public class HiRefreshLayout extends FrameLayout implements HiRefresh {
     private static final String TAG = HiRefreshLayout.class.getSimpleName();
@@ -22,6 +22,7 @@ public class HiRefreshLayout extends FrameLayout implements HiRefresh {
     private AutoScroller mAutoScroller;
     private HiRefresh.HiRefreshListener mHiRefreshListener;
     protected HiOverView mHiOverView;
+    //下拉距离的Y轴坐标
     private int mLastY;
     //刷新时是否禁止滚动
     private boolean disableRefreshScroll;
@@ -134,11 +135,15 @@ public class HiRefreshLayout extends FrameLayout implements HiRefresh {
             return false;
         }
 
+        //获取整个ViewGroup的最外层容器
         View head = getChildAt(0);
+        //该手势判断为用户松开手的事件
         if (ev.getAction() == MotionEvent.ACTION_UP || ev.getAction() == MotionEvent.ACTION_CANCEL
-                || ev.getAction() == MotionEvent.ACTION_POINTER_INDEX_MASK) {//松开手
+                || ev.getAction() == MotionEvent.ACTION_POINTER_INDEX_MASK) {
+            //如果head底部坐标不为0，说明顶部视图已经被用户拉下来了
             if (head.getBottom() > 0) {
-                if (mState != HiRefreshState.STATE_REFRESH) {//非正在刷新
+                if (mState != HiRefreshState.STATE_REFRESH) {//如果当前组件的状态不是正在刷新的状态
+                    //将组件滚回原位置
                     recover(head.getBottom());
                     return false;
                 }
@@ -187,6 +192,7 @@ public class HiRefreshLayout extends FrameLayout implements HiRefresh {
         }
     }
 
+    //让视图滚动回指定位置
     private void recover(int dis) {//dis =200  200-100
         if (mHiRefreshListener != null && dis > mHiOverView.mPullRefreshHeight) {
             mAutoScroller.recover(dis - mHiOverView.mPullRefreshHeight);
@@ -289,6 +295,9 @@ public class HiRefreshLayout extends FrameLayout implements HiRefresh {
             }
         }
 
+        /*
+         * 触发滚动
+         */
         void recover(int dis) {
             if (dis <= 0) {
                 return;
