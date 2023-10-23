@@ -106,7 +106,6 @@ public class HiTabBottom extends RelativeLayout implements IHiTab<HiTabBottomInf
      */
     private void inflateInfo(boolean selected, boolean init) {
         if (tabInfo.tabType == HiTabBottomInfo.TabType.ICON) {
-            //初始化时，需要基于Tab的类型，将
             if (init) {
                 tabImageView.setVisibility(GONE);
                 tabIconView.setVisibility(VISIBLE);
