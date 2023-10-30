@@ -44,6 +44,9 @@ public class HiBanner extends FrameLayout implements IHiBanner {
         initCustomAttrs(context, attrs);
     }
 
+    /**
+     * 通过xml文件，对Banner的属性进行配置 
+     */
     private void initCustomAttrs(Context context, AttributeSet attrs) {
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.HiBanner);
         boolean autoPlay = typedArray.getBoolean(R.styleable.HiBanner_autoPlay, true);

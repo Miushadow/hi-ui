@@ -28,7 +28,7 @@ public class HiBannerDelegate implements ViewPager.OnPageChangeListener, IHiBann
     private boolean mLoop;
     private List<? extends HiBannerMo> mHiBannerMos;
     private ViewPager.OnPageChangeListener mOnPageChangeListener;
-    private int mIntervalTime = 5000;
+    private int mIntervalTime = 5000;  //默认时间滚动间隔
     private HiBanner.OnBannerClickListener mOnBannerClickListener;
     private HiViewPager mHiViewPager;
     private int mScrollDuration = -1;

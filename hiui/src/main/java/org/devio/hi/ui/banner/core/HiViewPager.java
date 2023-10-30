@@ -15,12 +15,16 @@ import java.lang.reflect.Field;
  * 实现了自动翻页的ViewPager
  */
 public class HiViewPager extends ViewPager {
+
+    //滚动的时间间隔
     private int mIntervalTime;
     /**
      * 是否开启自动轮播
      */
     private boolean mAutoPlay = true;
     private boolean isLayout;
+
+    //结合Handler和Runnable，来实现定时播放的功能
     private Handler mHandler = new Handler();
     private Runnable mRunnable = new Runnable() {
 
@@ -43,6 +47,10 @@ public class HiViewPager extends ViewPager {
         }
     }
 
+
+    /**
+     * 在自动滚动期间，如果用户有触摸事件，则停止自动播放。当用户松开手时，再继续自动播放
+     */
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
@@ -65,6 +73,10 @@ public class HiViewPager extends ViewPager {
         isLayout = true;
     }
 
+    /**
+     * 解决ViewPager和RecyclerView混合使用时，出现的第一个问题
+     * 问题1.RecyclerView滚动上去，直至ViewPager看不见，再滚动下来，ViewPager下一次切换没有动画
+     */
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
@@ -81,6 +93,11 @@ public class HiViewPager extends ViewPager {
         start();
     }
 
+
+    /**
+     * 解决ViewPager和RecyclerView混合使用时，出现的第二个问题
+     * 问题2.当ViewPager滚动到一半的时候，RecyclerView滚动上去，再滚动下来，ViewPager会卡在一半
+     */
     @Override
     protected void onDetachedFromWindow() {
         //fix 使用RecyclerView + ViewPager bug
@@ -121,8 +138,11 @@ public class HiViewPager extends ViewPager {
         }
     }
 
+    /**
+     * 停止Timer
+     */
     public void stop() {
-        mHandler.removeCallbacksAndMessages(null);           //停止Timer
+        mHandler.removeCallbacksAndMessages(null);
     }
 
     /**
@@ -138,7 +158,7 @@ public class HiViewPager extends ViewPager {
             return nextPosition;
         }
         nextPosition = getCurrentItem() + 1;
-        //下一个索引大于adapter的view的最大数量时重新开始
+        //下一个索引大于adapter的view的最大数量时重新开始，实现无限轮播
         if (nextPosition >= getAdapter().getCount()) {
             nextPosition = ((HiBannerAdapter) getAdapter()).getFirstItem();
         }

@@ -37,6 +37,9 @@ public class HiBannerAdapter extends PagerAdapter {
         this.mContext = mContext;
     }
 
+    /**
+     * 提供给用户的方法，用于设置数据
+     */
     public void setBannerData(@NonNull List<? extends HiBannerMo> models) {
         this.models = models;
         initCachedView();
@@ -44,8 +47,12 @@ public class HiBannerAdapter extends PagerAdapter {
 
     }
 
+    /**
+     * 初始化Banner数据
+     */
     private void initCachedView() {
         mCachedViews = new SparseArray<>();
+        //遍历所有的model，并将model的索引放到viewHolder中
         for (int i = 0; i < models.size(); i++) {
             HiBannerViewHolder viewHolder = new HiBannerViewHolder(createView(LayoutInflater.from(mContext), null));
             mCachedViews.put(i, viewHolder);
@@ -103,6 +110,9 @@ public class HiBannerAdapter extends PagerAdapter {
         return view == object;
     }
 
+    /**
+     * 对Item进行实例化
+     */
     @NonNull
     @Override
     public Object instantiateItem(@NonNull ViewGroup container, int position) {
@@ -111,11 +121,15 @@ public class HiBannerAdapter extends PagerAdapter {
             realPosition = position % getRealCount();
         }
         HiBannerViewHolder viewHolder = mCachedViews.get(realPosition);
+        //如果ViewHolder的rootView已经被添加进去了，就需要通过container将它给移除掉
         if (container.equals(viewHolder.rootView.getParent())) {
             container.removeView(viewHolder.rootView);
         }
 
+        //进行数据绑定
         onBind(viewHolder, models.get(realPosition), realPosition);
+        
+        //异常处理，如果rootView的parent不为空，将它给移除并重新添加，防止重复添加
         if (viewHolder.rootView.getParent() != null) {
             ((ViewGroup) viewHolder.rootView.getParent()).removeView(viewHolder.rootView);
         }
