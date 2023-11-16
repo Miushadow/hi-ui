@@ -20,6 +20,8 @@ import org.devio.hi.ui.banner.indicator.HiIndicator;
 import java.util.List;
 
 /**
+ * HiBanner的门面
+ * 
  * 核心问题：
  * 1. 如何实现UI的高度定制？
  * 2. 作为有限的item如何实现无线轮播呢？

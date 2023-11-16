@@ -9,6 +9,9 @@ import org.devio.hi.ui.banner.indicator.HiIndicator;
 
 import java.util.List;
 
+/**
+ * HiBanner对外统一接口
+ */
 public interface IHiBanner {
     void setBannerData(@LayoutRes int layoutResId, @NonNull List<? extends HiBannerMo> models);
 
