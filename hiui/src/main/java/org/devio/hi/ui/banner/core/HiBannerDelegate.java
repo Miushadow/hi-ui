@@ -44,6 +44,9 @@ public class HiBannerDelegate implements ViewPager.OnPageChangeListener, IHiBann
         init(layoutResId);
     }
 
+    /**
+     * 用户未制定layoutResId的情况下，指定一个默认的layoutResId
+     */
     @Override
     public void setBannerData(@NonNull List<? extends HiBannerMo> models) {
         setBannerData(R.layout.hi_banner_item_image, models);
@@ -71,6 +74,7 @@ public class HiBannerDelegate implements ViewPager.OnPageChangeListener, IHiBann
     @Override
     public void setAutoPlay(boolean autoPlay) {
         this.mAutoPlay = autoPlay;
+        //让AutoPlay即时生效
         if (mAdapter != null) mAdapter.setAutoPlay(autoPlay);
         if (mHiViewPager != null) mHiViewPager.setAutoPlay(autoPlay);
     }
@@ -98,7 +102,12 @@ public class HiBannerDelegate implements ViewPager.OnPageChangeListener, IHiBann
         if (mHiViewPager != null && duration > 0) mHiViewPager.setScrollDuration(duration);
     }
 
+    /**
+     * 对HiBannerDelegate进行初始化
+     * 备注：在初始化HiBannerDelegate之前，创建HiBanner类时，就已经通过解析xml文件，对Banner的属性进行配置了
+     */
     private void init(@LayoutRes int layoutResId) {
+        //mAdapter和mHiIndicator都需要在init时判空， 如果为空，则主动创建
         if (mAdapter == null) {
             mAdapter = new HiBannerAdapter(mContext);
         }

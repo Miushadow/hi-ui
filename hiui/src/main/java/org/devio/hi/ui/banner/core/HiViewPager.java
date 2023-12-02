@@ -108,7 +108,7 @@ public class HiViewPager extends ViewPager {
     }
 
     /**
-     * 设置ViewPager的滚动速度
+     * 通过反射，来设置ViewPager的滚动速度
      *
      * @param duration page切换的时间长度
      */
