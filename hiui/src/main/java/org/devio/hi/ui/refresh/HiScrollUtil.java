@@ -39,16 +39,18 @@ public class HiScrollUtil {
     }
 
     /**
-     * 查找可以滚动的child
+     * 从ViewGroup里，查找可以滚动的子View（Child）
      *
      * @return 可以滚动的child
      */
     public static View findScrollableChild(@NonNull ViewGroup viewGroup) {
         View child = viewGroup.getChildAt(1);
+        //如果直接是RecyclerView或者AdapterView的实例，则直接返回
         if (child instanceof RecyclerView || child instanceof AdapterView) {
             return child;
         }
-        if (child instanceof ViewGroup) {//往下多找一层
+        //最多往下再多找一层
+        if (child instanceof ViewGroup) {
             View tempChild = ((ViewGroup) child).getChildAt(0);
             if (tempChild instanceof RecyclerView || tempChild instanceof AdapterView) {
                 child = tempChild;

@@ -17,12 +17,16 @@ import java.lang.reflect.Field;
  * 实现了自动翻页的ViewPager
  */
 public class HiViewPager extends ViewPager {
+
+    //滚动的时间间隔
     private int mIntervalTime;
     /**
      * 是否开启自动轮播
      */
     private boolean mAutoPlay = true;
     private boolean isLayout;
+
+    //结合Handler和Runnable，来实现定时播放的功能
     private Handler mHandler = new Handler();
 
     private Runnable mRunnable = new Runnable() {
@@ -46,6 +50,10 @@ public class HiViewPager extends ViewPager {
         }
     }
 
+
+    /**
+     * 在自动滚动期间，如果用户有触摸事件，则停止自动播放。当用户松开手时，再继续自动播放
+     */
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
@@ -145,8 +153,11 @@ public class HiViewPager extends ViewPager {
         }
     }
 
+    /**
+     * 停止Timer
+     */
     public void stop() {
-        mHandler.removeCallbacksAndMessages(null);           //停止Timer
+        mHandler.removeCallbacksAndMessages(null);
     }
 
     /**
@@ -162,7 +173,7 @@ public class HiViewPager extends ViewPager {
             return nextPosition;
         }
         nextPosition = getCurrentItem() + 1;
-        //下一个索引大于adapter的view的最大数量时重新开始
+        //下一个索引大于adapter的view的最大数量时重新开始，实现无限轮播
         if (nextPosition >= getAdapter().getCount()) {
             nextPosition = ((HiBannerAdapter) getAdapter()).getFirstItem();
         }

@@ -28,7 +28,7 @@ public class HiBannerDelegate implements ViewPager.OnPageChangeListener, IHiBann
     private boolean mLoop;
     private List<? extends HiBannerMo> mHiBannerMos;
     private ViewPager.OnPageChangeListener mOnPageChangeListener;
-    private int mIntervalTime = 5000;
+    private int mIntervalTime = 5000;  //默认时间滚动间隔
     private HiBanner.OnBannerClickListener mOnBannerClickListener;
     private HiViewPager mHiViewPager;
     private int mScrollDuration = -1;
@@ -48,7 +48,7 @@ public class HiBannerDelegate implements ViewPager.OnPageChangeListener, IHiBann
     }
 
     /**
-     * 为Banner设置具体数据，默认加载视图hi_banner_item_image
+     * 为Banner设置具体数据，用户未制定layoutResId的情况下，指定一个默认的layoutResId（hi_banner_item_image）
      */
     @Override
     public void setBannerData(@NonNull List<? extends HiBannerMo> models) {
@@ -77,6 +77,7 @@ public class HiBannerDelegate implements ViewPager.OnPageChangeListener, IHiBann
     @Override
     public void setAutoPlay(boolean autoPlay) {
         this.mAutoPlay = autoPlay;
+        //让AutoPlay即时生效
         if (mAdapter != null) mAdapter.setAutoPlay(autoPlay);
         if (mHiViewPager != null) mHiViewPager.setAutoPlay(autoPlay);
     }
@@ -104,7 +105,12 @@ public class HiBannerDelegate implements ViewPager.OnPageChangeListener, IHiBann
         if (mHiViewPager != null && duration > 0) mHiViewPager.setScrollDuration(duration);
     }
 
+    /**
+     * 对HiBannerDelegate进行初始化
+     * 备注：在初始化HiBannerDelegate之前，创建HiBanner类时，就已经通过解析xml文件，对Banner的属性进行配置了
+     */
     private void init(@LayoutRes int layoutResId) {
+        //mAdapter和mHiIndicator都需要在init时判空， 如果为空，则主动创建
         if (mAdapter == null) {
             mAdapter = new HiBannerAdapter(mContext);
         }
