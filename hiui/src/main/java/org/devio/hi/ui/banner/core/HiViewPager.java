@@ -12,6 +12,8 @@ import androidx.viewpager.widget.ViewPager;
 import java.lang.reflect.Field;
 
 /**
+ * 自定义的ViewPager，实现了以下功能：
+ * 1.自动播放
  * 实现了自动翻页的ViewPager
  */
 public class HiViewPager extends ViewPager {
@@ -22,6 +24,7 @@ public class HiViewPager extends ViewPager {
     private boolean mAutoPlay = true;
     private boolean isLayout;
     private Handler mHandler = new Handler();
+
     private Runnable mRunnable = new Runnable() {
 
         public void run() {
@@ -65,15 +68,30 @@ public class HiViewPager extends ViewPager {
         isLayout = true;
     }
 
+    /**
+     * 通过反射，去获取ViewPager.java的私有变量“mFirstLayout”，以更改mFirstLayout的值，解决RecyclerView + ViewPager结合使用的一个已知问题
+     * 
+     * 问题细节：
+     * ViewPager里有一个私有变量mFirstLayout，它是表示是不是第一次显示布局，如果是true，则使用无动画的方式显示当前item；
+     * 如果是false，则使用动画方式显示当前item。
+     * 
+     * 当ViewPager滚动上去后，因为RecyclerView的回收机制，ViewPager会走onDetachFromWindow，当再次滚动下来时，ViewPager会走onAttachedToWindow。
+     * 在onAttachedToWindow中，mFirstLayout被重置为true，所以下一次滚动就没有动画。
+     * 
+     * 所以这里我们需要重写onAttachedToWindow，通过反射的方式将私有变量“mFirstLayout”设置为false，
+     * 
+     * fix 使用RecyclerView + ViewPager bug https://blog.csdn.net/u011002668/article/details/72884893
+     */
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         if (isLayout && getAdapter() != null && getAdapter().getCount() > 0) {
             try {
-                //fix 使用RecyclerView + ViewPager bug https://blog.csdn.net/u011002668/article/details/72884893
-                Field mScroller = ViewPager.class.getDeclaredField("mFirstLayout");
-                mScroller.setAccessible(true);
-                mScroller.set(this, false);
+                //通过getDeclaredField获取私有变量"mFirstLayout"
+                //setAccessible(true)的意思是设置该字段为可访问字段，即使是private，也可以强制访问
+                Field mFirstLayout = ViewPager.class.getDeclaredField("mFirstLayout");
+                mFirstLayout.setAccessible(true);
+                mFirstLayout.set(this, false);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -81,6 +99,10 @@ public class HiViewPager extends ViewPager {
         start();
     }
 
+    /**
+     * ViewPager的onDetachFromWindow方法会把动画直接停掉，需要想办法进行保护
+     * 当activitydestroy的时候，给自定义ViewPager一个标志位hasActivityDestroy，只有hasActivityDestroy为true的时候，才调用父类的super.onDetachedFromWindow();
+     */
     @Override
     protected void onDetachedFromWindow() {
         //fix 使用RecyclerView + ViewPager bug
@@ -91,13 +113,15 @@ public class HiViewPager extends ViewPager {
     }
 
     /**
-     * 设置ViewPager的滚动速度
+     * 利用反射，设置HiBannerScroller中的duration，从而设置ViewPager的滚动速度
      *
      * @param duration page切换的时间长度
      */
     public void setScrollDuration(int duration) {
         try {
             Field scrollerField = ViewPager.class.getDeclaredField("mScroller");
+            //通过getDeclaredField获取私有变量"mScroller"
+                //setAccessible(true)的意思是设置该字段为可访问字段，即使是private，也可以强制访问
             scrollerField.setAccessible(true);
             scrollerField.set(this, new HiBannerScroller(getContext(), duration));
         } catch (Exception e) {

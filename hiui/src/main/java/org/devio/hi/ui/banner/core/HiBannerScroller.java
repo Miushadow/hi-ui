@@ -9,7 +9,7 @@ import android.widget.Scroller;
 public class HiBannerScroller extends Scroller {
 
     /**
-     * 值越大，滑动越慢
+     * Scroller的滚动速度，值越大，滑动越慢
      */
     private int mDuration = 1000;
 

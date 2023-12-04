@@ -20,7 +20,7 @@ import org.devio.hi.ui.banner.indicator.HiIndicator;
 import java.util.List;
 
 /**
- * HiBanner的门面
+ * HiBanner的门面，为保证门面干净整洁，具体的逻辑交给代理HiBannerDelegate去做
  * 
  * 核心问题：
  * 1. 如何实现UI的高度定制？
@@ -46,6 +46,9 @@ public class HiBanner extends FrameLayout implements IHiBanner {
         initCustomAttrs(context, attrs);
     }
 
+    /*
+     * 初始化定制的属性
+     */
     private void initCustomAttrs(Context context, AttributeSet attrs) {
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.HiBanner);
         boolean autoPlay = typedArray.getBoolean(R.styleable.HiBanner_autoPlay, true);

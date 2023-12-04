@@ -19,17 +19,16 @@ import java.util.List;
  */
 public class HiBannerAdapter extends PagerAdapter {
     private Context mContext;
+    //稀疏数组
     private SparseArray<HiBannerViewHolder> mCachedViews = new SparseArray<>();
     private HiBanner.OnBannerClickListener mBannerClickListener;
     private IBindAdapter mBindAdapter;
     private List<? extends HiBannerMo> models;
-    /**
-     * 是否开启自动轮
-     */
+    
+    //是否开启自动轮播
     private boolean mAutoPlay = true;
-    /**
-     * 非自动轮播状态下是否可以循环切换
-     */
+    
+    //非自动轮播状态下是否可以循环切换
     private boolean mLoop = false;
     private int mLayoutResId = -1;
 
@@ -41,7 +40,6 @@ public class HiBannerAdapter extends PagerAdapter {
         this.models = models;
         initCachedView();
         notifyDataSetChanged();
-
     }
 
     private void initCachedView() {
@@ -81,6 +79,10 @@ public class HiBannerAdapter extends PagerAdapter {
         return models == null ? 0 : models.size();
     }
 
+    /**
+     * 
+     * @return
+     */
     @Override
     public int getCount() {
         //无限轮播关键点

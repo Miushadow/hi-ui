@@ -38,12 +38,18 @@ public class HiBannerDelegate implements ViewPager.OnPageChangeListener, IHiBann
         mBanner = banner;
     }
 
+    /**
+     * 为Banner设置加载的视图，以及具体的数据
+     */
     @Override
     public void setBannerData(@LayoutRes int layoutResId, @NonNull List<? extends HiBannerMo> models) {
         mHiBannerMos = models;
         init(layoutResId);
     }
 
+    /**
+     * 为Banner设置具体数据，默认加载视图hi_banner_item_image
+     */
     @Override
     public void setBannerData(@NonNull List<? extends HiBannerMo> models) {
         setBannerData(R.layout.hi_banner_item_image, models);
